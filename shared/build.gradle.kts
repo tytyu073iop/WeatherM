@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -9,6 +10,14 @@ plugins {
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.buildkonfig)
+}
+
+buildkonfig {
+    packageName = "com.example.weatherm"
+    defaultConfigs {
+        buildConfigField(STRING, "WEATHER_API_KEY", project.findProperty("WEATHER_API_KEY")?.toString() ?: "")
+    }
 }
 
 room3 {

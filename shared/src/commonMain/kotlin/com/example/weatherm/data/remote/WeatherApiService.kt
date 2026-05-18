@@ -1,5 +1,6 @@
 package com.example.weatherm.data.remote
 
+import com.example.weatherm.BuildKonfig
 import com.example.weatherm.data.model.CurrentWeatherResponse
 import com.example.weatherm.data.model.ForecastResponse
 import com.example.weatherm.data.model.GeocodingResponse
@@ -21,7 +22,7 @@ open class WeatherApiService {
         }
     }
 
-    private val apiKey = "YOUR_API_KEY" // TODO: Provide real API key
+    private val apiKey = BuildKonfig.WEATHER_API_KEY
     private val baseUrl = "https://api.openweathermap.org"
 
     open suspend fun getCurrentWeather(lat: Double, lon: Double): CurrentWeatherResponse {
