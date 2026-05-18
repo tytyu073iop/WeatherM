@@ -99,6 +99,7 @@ kotlin {
         }
         wasmJsMain.dependencies {
             implementation(libs.androidx.sqlite.web)
+            implementation(libs.wrappers.browser)
         }
         jvmMain.dependencies {
             implementation(libs.sqlite.bundled)
@@ -113,4 +114,6 @@ dependencies {
     add("kspIosArm64", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
     add("kspJvm", libs.androidx.room.compiler)
+    add("kspWasmJs", libs.androidx.room.compiler)
+    add("kspJs", libs.androidx.room.compiler)
 }

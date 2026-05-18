@@ -13,9 +13,7 @@ abstract class CityDatabase : RoomDatabase() {
 
 // The expected companion object for Room KMP
 @Suppress("NO_ACTUAL_FOR_EXPECT")
-expect object CityDatabaseConstructor : RoomDatabaseConstructor<CityDatabase> {
-    override fun initialize(): CityDatabase
-}
+expect object CityDatabaseConstructor : RoomDatabaseConstructor<CityDatabase>
 
 fun getRoomDatabase(
     builder: RoomDatabase.Builder<CityDatabase>
