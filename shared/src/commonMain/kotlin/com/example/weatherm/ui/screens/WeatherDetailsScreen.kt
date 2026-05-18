@@ -13,8 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.weatherm.ui.WeatherViewModel
-import com.example.weatherm.ui.components.AdaptiveWeatherCard
-import coil3.compose.AsyncImage
+import com.example.weatherm.ui.components.*
+import coil3.compose.SubcomposeAsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +28,7 @@ fun WeatherDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(forecast?.list?.firstOrNull()?.dtTxt ?: "Details") },
+                title = { Text(forecast?.list?.firstOrNull()?.dtTxt ?: "Loading...") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -41,10 +41,11 @@ fun WeatherDetailsScreen(
             modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (forecast == null) {
-                CircularProgressIndicator()
+            if (forecast == null || uiState.isLoading) {
+                WeatherDetailsSkeleton()
             } else {
                 val current = forecast.list.firstOrNull()
+                // ... rest of the content
                 current?.let {
                     Text(it.main.temp.toInt().toString() + "°C", style = MaterialTheme.typography.displayLarge)
                     Text(it.weather.firstOrNull()?.description ?: "", style = MaterialTheme.typography.headlineMedium)
@@ -69,10 +70,13 @@ fun WeatherDetailsScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(item.dtTxt.substringBefore(" ").substring(5))
-                                    AsyncImage(
+                                    SubcomposeAsyncImage(
                                         model = "https://openweathermap.org/img/wn/${item.weather.first().icon}@2x.png",
                                         contentDescription = null,
-                                        modifier = Modifier.size(48.dp)
+                                        modifier = Modifier.size(48.dp),
+                                        loading = {
+                                            Box(modifier = Modifier.fillMaxSize().shimmerEffect())
+                                        }
                                     )
                                     Text("${item.main.temp.toInt()}°C")
                                 }

@@ -1,6 +1,8 @@
 package com.example.weatherm.ui.components
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
@@ -9,14 +11,94 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.weatherm.getPlatform
 import com.example.weatherm.ui.CityWeatherState
 import com.example.weatherm.data.local.CityEntity
-import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
+
+fun Modifier.shimmerEffect(): Modifier = composed {
+    val transition = rememberInfiniteTransition(label = "shimmer")
+    val translateAnim by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shimmer_animation"
+    )
+
+    val shimmerColors = listOf(
+        Color.LightGray.copy(alpha = 0.6f),
+        Color.LightGray.copy(alpha = 0.2f),
+        Color.LightGray.copy(alpha = 0.6f),
+    )
+
+    val brush = Brush.linearGradient(
+        colors = shimmerColors,
+        start = Offset.Zero,
+        end = Offset(x = translateAnim, y = translateAnim)
+    )
+
+    return@composed this.then(background(brush))
+}
+
+@Composable
+fun CityCardSkeleton() {
+    AdaptiveWeatherCard(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Box(modifier = Modifier.fillMaxWidth(0.5f).height(24.dp).shimmerEffect())
+                Spacer(modifier = Modifier.height(8.dp))
+                Box(modifier = Modifier.fillMaxWidth(0.3f).height(16.dp).shimmerEffect())
+            }
+            Box(modifier = Modifier.size(64.dp).shimmerEffect())
+        }
+    }
+}
+
+@Composable
+fun WeatherDetailsSkeleton() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(modifier = Modifier.size(100.dp, 60.dp).shimmerEffect())
+        Spacer(modifier = Modifier.height(16.dp))
+        Box(modifier = Modifier.size(150.dp, 30.dp).shimmerEffect())
+        
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+            repeat(3) {
+                Box(modifier = Modifier.size(60.dp, 40.dp).shimmerEffect())
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Box(modifier = Modifier.size(200.dp, 30.dp).shimmerEffect())
+        
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row {
+            repeat(4) {
+                Box(modifier = Modifier.size(100.dp, 120.dp).padding(8.dp).shimmerEffect())
+            }
+        }
+    }
+}
 
 @Composable
 fun AdaptiveWeatherCard(
@@ -158,10 +240,13 @@ fun CityCard(
             }
 
             cityState.currentWeather?.weather?.firstOrNull()?.icon?.let { icon ->
-                AsyncImage(
+                SubcomposeAsyncImage(
                     model = "https://openweathermap.org/img/wn/$icon@2x.png",
                     contentDescription = null,
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(64.dp),
+                    loading = {
+                        Box(modifier = Modifier.fillMaxSize().shimmerEffect())
+                    }
                 )
             }
         }

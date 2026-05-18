@@ -41,6 +41,10 @@ fun CityDashboardScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        if (uiState.isLoading && uiState.searchResults.isEmpty()) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        }
+
         if (uiState.searchResults.isNotEmpty()) {
             LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)) {
                 items(uiState.searchResults) { result ->
@@ -55,10 +59,16 @@ fun CityDashboardScreen(
             }
         }
 
-        AdaptiveCityList(
-            cities = uiState.savedCities,
-            onCityClick = onCityClick,
-            modifier = Modifier.weight(1f)
-        )
+        if (uiState.savedCities.isEmpty() && uiState.isLoading) {
+            Column {
+                repeat(3) { CityCardSkeleton() }
+            }
+        } else {
+            AdaptiveCityList(
+                cities = uiState.savedCities,
+                onCityClick = onCityClick,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
