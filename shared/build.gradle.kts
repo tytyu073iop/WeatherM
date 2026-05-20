@@ -36,7 +36,7 @@ kotlin {
         }
         iosTarget.binaries.all {
             freeCompilerArgs += listOf(
-                "-Xoverride-konan-properties=minVersion.ios=16.0;minVersionSinceXcode15.ios=16.0;appleSdkMinVersion.ios=16.0;appleSdkMinVersion.ios_arm64=16.0;appleSdkMinVersion.ios_simulator_arm64=16.0",
+                "-Xoverride-konan-properties=minVersion.ios=18.5;minVersionSinceXcode15.ios=18.5;appleSdkMinVersion.ios=18.5;appleSdkMinVersion.ios_arm64=18.5;appleSdkMinVersion.ios_simulator_arm64=18.5",
                 "-linker-options", "-framework UIKit",
                 "-linker-options", "-framework CoreGraphics"
             )
