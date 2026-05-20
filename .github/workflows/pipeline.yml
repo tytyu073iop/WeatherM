@@ -56,6 +56,7 @@ jobs:
 
       - name: Build Release Artifacts
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) && matrix.build_task != ''
+        shell: bash
         run: |
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             VERSION_NAME="${{ github.ref_name }}"
