@@ -1,0 +1,102 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-and-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: Android
+            os: ubuntu-latest
+            test_task: ":androidApp:testDebugUnitTest :shared:testAndroid"
+            build_task: ":androidApp:assembleDebug"
+            artifact_path: "androidApp/build/outputs/apk/debug/*.apk"
+            artifact_name: "android-apk"
+          - target: Desktop-Linux
+            os: ubuntu-latest
+            test_task: ":desktopApp:test :shared:jvmTest"
+            build_task: ":desktopApp:packageDistributionForCurrentOS"
+            artifact_path: "desktopApp/build/compose/binaries/main/deb/*.deb"
+            artifact_name: "desktop-linux"
+          - target: Desktop-Windows
+            os: windows-latest
+            test_task: ":desktopApp:test :shared:jvmTest"
+            build_task: ":desktopApp:packageDistributionForCurrentOS"
+            artifact_path: "desktopApp/build/compose/binaries/main/msi/*.msi"
+            artifact_name: "desktop-windows"
+          - target: Web
+            os: ubuntu-latest
+            test_task: ":webApp:wasmJsBrowserTest :shared:wasmJsBrowserTest"
+          - target: iOS
+            os: macos-latest
+            test_task: ":shared:iosSimulatorArm64Test"
+
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.target }}
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Run Tests
+        run: ./gradlew ${{ matrix.test_task }}
+
+      - name: Build Release Artifacts
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) && matrix.build_task != ''
+        run: ./gradlew ${{ matrix.build_task }} -PappVersionName=${{ github.ref_name }} --no-configuration-cache
+
+      - name: Upload Artifacts
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) && matrix.artifact_path != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
+
+  create-release:
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Determine Release Info
+        id: release_info
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "name=Release ${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          else
+            echo "tag=nightly-${{ github.run_number }}" >> $GITHUB_OUTPUT
+            echo "name=Nightly Build ${{ github.run_number }}" >> $GITHUB_OUTPUT
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_info.outputs.tag }}
+          name: ${{ steps.release_info.outputs.name }}
+          prerelease: ${{ steps.release_info.outputs.prerelease }}
+          files: |
+            **/*.apk
+            **/*.deb
+            **/*.msi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

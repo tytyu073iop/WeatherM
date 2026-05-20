@@ -32,10 +32,11 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
-            linkerOpts("-Xlinker", "-ios_deployment_target", "-Xlinker", "15.0")
         }
         iosTarget.binaries.all {
-            linkerOpts("-Xlinker", "-ios_deployment_target", "-Xlinker", "15.0")
+            freeCompilerArgs += listOf(
+                "-Xoverride-konan-properties=appleSdkMinVersion.ios_arm64=15.0;appleSdkMinVersion.ios_simulator_arm64=15.0"
+            )
         }
     }
     
