@@ -112,6 +112,7 @@ kotlin {
         }
         jvmMain.dependencies {
             implementation(libs.sqlite.bundled)
+            implementation(libs.ktor.client.okhttp)
         }
     }
 }

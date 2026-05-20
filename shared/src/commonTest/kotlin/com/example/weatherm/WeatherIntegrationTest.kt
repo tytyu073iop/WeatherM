@@ -4,6 +4,7 @@ import com.example.weatherm.data.local.CityDao
 import com.example.weatherm.data.local.CityEntity
 import com.example.weatherm.data.model.*
 import com.example.weatherm.data.remote.WeatherApiService
+import com.example.weatherm.data.repository.RealWeatherRepository
 import com.example.weatherm.data.repository.WeatherRepository
 import com.example.weatherm.ui.WeatherViewModel
 import kotlinx.coroutines.flow.Flow
@@ -40,7 +41,7 @@ class WeatherIntegrationTest {
     fun testAddCityAndFetchWeather() = runTest {
         val dao = FakeCityDao()
         val api = MockWeatherApi()
-        val repository = WeatherRepository(api, dao)
+        val repository = RealWeatherRepository(api, dao)
         val viewModel = WeatherViewModel(repository)
 
         val city = GeocodingResponse("Minsk", 53.9, 27.56, "BY")
@@ -50,7 +51,7 @@ class WeatherIntegrationTest {
     @Test
     fun testRemoveCityUpdatesViewModel() = runTest {
         val dao = FakeCityDao()
-        val repository = WeatherRepository(MockWeatherApi(), dao)
+        val repository = RealWeatherRepository(MockWeatherApi(), dao)
         val viewModel = WeatherViewModel(repository)
         
         val city = CityEntity("Minsk", 53.9, 27.56, "BY")
@@ -61,7 +62,7 @@ class WeatherIntegrationTest {
     fun testSelectCityAndLoadForecast() = runTest {
         val dao = FakeCityDao()
         val api = MockWeatherApi()
-        val repository = WeatherRepository(api, dao)
+        val repository = RealWeatherRepository(api, dao)
         val viewModel = WeatherViewModel(repository)
 
         val city = CityEntity("Minsk", 53.9, 27.56, "BY")

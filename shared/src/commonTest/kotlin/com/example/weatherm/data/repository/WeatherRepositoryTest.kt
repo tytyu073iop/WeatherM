@@ -28,7 +28,7 @@ class WeatherRepositoryTest {
     @Test
     fun testAddAndRemoveCity() = runTest {
         val dao = FakeCityDao()
-        val repository = WeatherRepository(WeatherApiService(), dao)
+        val repository = RealWeatherRepository(WeatherApiService(), dao)
         
         val city = GeocodingResponse("Minsk", 53.9, 27.56, "BY")
         repository.addCity(city)
@@ -54,7 +54,7 @@ class WeatherRepositoryTest {
                 )
             }
         }
-        val repository = WeatherRepository(mockApi, FakeCityDao())
+        val repository = RealWeatherRepository(mockApi, FakeCityDao())
         val weather = repository.getCurrentWeather(53.9, 27.56)
         assertEquals("Minsk", weather.name)
         assertEquals(20.0, weather.main.temp)
@@ -69,7 +69,7 @@ class WeatherRepositoryTest {
                 ))
             }
         }
-        val repository = WeatherRepository(mockApi, FakeCityDao())
+        val repository = RealWeatherRepository(mockApi, FakeCityDao())
         val forecast = repository.getForecast(53.9, 27.56)
         assertEquals(1, forecast.list.size)
     }
