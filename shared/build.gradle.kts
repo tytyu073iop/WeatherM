@@ -34,9 +34,7 @@ kotlin {
             isStatic = true
         }
         iosTarget.binaries.all {
-            freeCompilerArgs += listOf(
-                "-Xoverride-konan-properties=appleSdkMinVersion.ios_arm64=15.0;appleSdkMinVersion.ios_simulator_arm64=15.0"
-            )
+            freeCompilerArgs += listOf("-Xmin-ios-version=15.0")
         }
     }
     
