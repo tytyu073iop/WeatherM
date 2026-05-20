@@ -15,18 +15,22 @@ jobs:
           - target: Android
             os: ubuntu-latest
             task: ":androidApp:assembleDebug"
+            test_task: ":androidApp:testDebugUnitTest :shared:testAndroid"
           - target: Desktop
             os: ubuntu-latest
             task: ":desktopApp:assemble"
+            test_task: ":desktopApp:test :shared:jvmTest"
           - target: Web
             os: ubuntu-latest
             task: ":webApp:wasmJsBrowserDistribution"
+            test_task: ":webApp:wasmJsBrowserTest :shared:wasmJsBrowserTest"
           - target: iOS
             os: macos-latest
             task: ":shared:compileKotlinIosSimulatorArm64"
+            test_task: ":shared:iosSimulatorArm64Test"
 
     runs-on: ${{ matrix.os }}
-    name: Build ${{ matrix.target }}
+    name: Build & Unit Test ${{ matrix.target }}
 
     steps:
       - uses: actions/checkout@v4
@@ -43,3 +47,6 @@ jobs:
 
       - name: Build ${{ matrix.target }}
         run: ./gradlew ${{ matrix.task }}
+
+      - name: Run Unit Tests ${{ matrix.target }}
+        run: ./gradlew ${{ matrix.test_task }}
