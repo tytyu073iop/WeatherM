@@ -25,11 +25,13 @@ compose.desktop {
             
             val rawVersion = project.findProperty("appVersionName")?.toString() ?: "1.0.0"
             // Package versions must be numeric for MSI, DEB and DMG.
-            // We convert "nightly-X" to "0.0.X" for the installer metadata.
-            packageVersion = if (rawVersion.startsWith("nightly-")) {
-                "0.0." + rawVersion.removePrefix("nightly-")
-            } else {
-                rawVersion
+            packageVersion = run {
+                val cleanVersion = rawVersion.removePrefix("v")
+                when {
+                    cleanVersion.startsWith("nightly-") -> "0.0." + cleanVersion.removePrefix("nightly-")
+                    cleanVersion.all { it.isDigit() || it == '.' } && cleanVersion.contains('.') -> cleanVersion
+                    else -> "0.0.0" // Fallback for branch names like "master" or "main"
+                }
             }
         }
     }
