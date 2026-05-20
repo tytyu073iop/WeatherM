@@ -23,52 +23,58 @@ fun CityDashboardScreen(
     var searchQuery by remember { mutableStateOf("") }
     val platform = getPlatform().name.lowercase()
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        if (platform.contains("ios")) {
-            IosCitySelector(
-                cities = uiState.savedCities.map { it.entity },
-                selectedCity = null, // Or handle selected city state
-                onCitySelected = { onCityClick(it) }
+    Scaffold { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            if (platform.contains("ios")) {
+                IosCitySelector(
+                    cities = uiState.savedCities.map { it.entity },
+                    selectedCity = null, // Or handle selected city state
+                    onCitySelected = { onCityClick(it) }
+                )
+            }
+
+            AdaptiveSearchField(
+                value = searchQuery,
+                onValueChange = {
+                    searchQuery = it
+                    if (it.length > 2) viewModel.searchCity(it)
+                },
+                modifier = Modifier.fillMaxWidth()
             )
-        }
 
-        AdaptiveSearchField(
-            value = searchQuery,
-            onValueChange = { 
-                searchQuery = it
-                if (it.length > 2) viewModel.searchCity(it)
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
+            if (uiState.isLoading && uiState.searchResults.isEmpty()) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
 
-        if (uiState.isLoading && uiState.searchResults.isEmpty()) {
-            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-        }
-
-        if (uiState.searchResults.isNotEmpty()) {
-            LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)) {
-                items(uiState.searchResults) { result ->
-                    ListItem(
-                        headlineContent = { Text("${result.name}, ${result.country}") },
-                        modifier = Modifier.clickable { 
-                            viewModel.addCity(result)
-                            searchQuery = ""
-                        }
-                    )
+            if (uiState.searchResults.isNotEmpty()) {
+                LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 200.dp)) {
+                    items(uiState.searchResults) { result ->
+                        ListItem(
+                            headlineContent = { Text("${result.name}, ${result.country}") },
+                            modifier = Modifier.clickable {
+                                viewModel.addCity(result)
+                                searchQuery = ""
+                            }
+                        )
+                    }
                 }
             }
-        }
 
-        if (uiState.savedCities.isEmpty() && uiState.isLoading) {
-            Column {
-                repeat(3) { CityCardSkeleton() }
+            if (uiState.savedCities.isEmpty() && uiState.isLoading) {
+                Column {
+                    repeat(3) { CityCardSkeleton() }
+                }
+            } else {
+                AdaptiveCityList(
+                    cities = uiState.savedCities,
+                    onCityClick = onCityClick,
+                    modifier = Modifier.weight(1f)
+                )
             }
-        } else {
-            AdaptiveCityList(
-                cities = uiState.savedCities,
-                onCityClick = onCityClick,
-                modifier = Modifier.weight(1f)
-            )
         }
     }
 }
