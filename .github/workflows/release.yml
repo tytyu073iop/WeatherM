@@ -41,7 +41,7 @@ jobs:
           cache: gradle
 
       - name: Build Desktop Package
-        run: ./gradlew :desktopApp:package -PappVersionName=nightly-${{ github.run_number }}
+        run: ./gradlew :desktopApp:packageDistributionForCurrentOS -PappVersionName=nightly-${{ github.run_number }} --no-configuration-cache
 
       - name: Upload Desktop Package
         uses: actions/upload-artifact@v4

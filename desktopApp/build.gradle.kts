@@ -21,7 +21,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.example.weatherm"
+            packageName = "WeatherM"
             
             val rawVersion = project.findProperty("appVersionName")?.toString() ?: "1.0.0"
             // Package versions must be numeric for MSI, DEB and DMG.
