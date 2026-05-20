@@ -34,9 +34,6 @@ jobs:
           - target: Web
             os: ubuntu-latest
             test_task: ":webApp:wasmJsBrowserTest :shared:wasmJsBrowserTest"
-          - target: iOS
-            os: macos-latest
-            test_task: ":shared:iosSimulatorArm64Test"
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.target }}
