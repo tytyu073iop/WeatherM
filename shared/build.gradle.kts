@@ -32,6 +32,10 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "Shared"
             isStatic = true
+            linkerOpts("-Xlinker", "-ios_deployment_target", "-Xlinker", "15.0")
+        }
+        iosTarget.binaries.all {
+            linkerOpts("-Xlinker", "-ios_deployment_target", "-Xlinker", "15.0")
         }
     }
     

@@ -22,7 +22,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "com.example.weatherm"
-            packageVersion = "1.0.0"
+            packageVersion = project.findProperty("appVersionName")?.toString() ?: "1.0.0"
         }
     }
 }

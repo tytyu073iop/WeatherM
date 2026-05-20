@@ -28,8 +28,8 @@ android {
         applicationId = "com.example.weatherm"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = project.findProperty("appVersionCode")?.toString()?.toInt() ?: 1
+        versionName = project.findProperty("appVersionName")?.toString() ?: "1.0.0"
     }
     packaging {
         resources {
